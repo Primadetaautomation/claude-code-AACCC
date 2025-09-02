@@ -19,17 +19,17 @@ function getEncryptedAPIKey() {
     if (!fs.existsSync(API_KEY_FILE)) {
       return null;
     }
-    
+
     const encryptedData = fs.readFileSync(API_KEY_FILE, 'utf8');
     const [iv, encrypted] = encryptedData.split(':');
-    
+
     // Use machine-specific key for decryption
     const key = crypto.scryptSync(os.hostname() + os.userInfo().username, 'salt', 32);
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'));
-    
+
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    
+
     return decrypted;
   } catch (error) {
     console.error('❌ Error reading API key:', error.message);
@@ -42,16 +42,16 @@ function getAPIKey() {
   if (process.env.ANTHROPIC_API_KEY) {
     return process.env.ANTHROPIC_API_KEY;
   }
-  
+
   // Then check encrypted file
   return getEncryptedAPIKey();
 }
 
-function callClaudeWithAPI(task) {
+function callClaudeWithAPI(_task) {
   // Check cost controls first
   const settings = costControl.loadSettings();
   const usage = costControl.loadUsage();
-  
+
   // Check if API is disabled
   if (!settings.apiEnabled || settings.forceLocal) {
     console.log('⚠️  API Mode is DISABLED (Cost Control)');
@@ -59,7 +59,7 @@ function callClaudeWithAPI(task) {
     callLocalClaude();
     return;
   }
-  
+
   // Check cost limit
   if (settings.costLimit && usage.estimatedCost >= settings.costLimit) {
     console.log('🚫 COST LIMIT REACHED: $' + settings.costLimit);
@@ -68,12 +68,12 @@ function callClaudeWithAPI(task) {
     callLocalClaude();
     return;
   }
-  
+
   // Show cost warning if needed
   if (usage.estimatedCost >= settings.warningThreshold) {
     console.log('⚠️  Cost Warning: $' + usage.estimatedCost.toFixed(2) + ' spent this period');
   }
-  
+
   // Require confirmation if enabled
   if (settings.requireConfirmation) {
     const readline = require('readline');
@@ -81,7 +81,7 @@ function callClaudeWithAPI(task) {
       input: process.stdin,
       output: process.stdout
     });
-    
+
     console.log('\n💰 This will use the Claude API (costs apply)');
     console.log('   Estimated cost: ~$0.015 per call');
     rl.question('   Continue? (y/n): ', (answer) => {
@@ -95,91 +95,91 @@ function callClaudeWithAPI(task) {
     });
     return;
   }
-  
+
   proceedWithAPI();
-  
+
   function proceedWithAPI() {
     const apiKey = getAPIKey();
-    
+
     if (!apiKey) {
       console.error('❌ No API key found. Run: claude-auto --setup');
       process.exit(1);
     }
-    
+
     // Track usage
     const today = new Date().toISOString().split('T')[0];
     usage.totalCalls++;
     usage.apiCalls++;
     usage.estimatedCost += 0.015; // Rough estimate
-    
+
     if (!usage.dailyUsage[today]) {
       usage.dailyUsage[today] = { calls: 0, cost: 0 };
     }
     usage.dailyUsage[today].calls++;
     usage.dailyUsage[today].cost += 0.015;
-    
+
     costControl.saveUsage(usage);
 
     try {
       console.log('🤖 Using Claude API (High Context Mode)');
-    
-    // Pass all arguments to claude command with --api and --max-context flags
-    const args = process.argv.slice(2);
-    
-    // Create environment with API key
-    const env = { ...process.env, ANTHROPIC_API_KEY: apiKey };
-    
-    // Use claude with API mode and max context
-    const claude = spawn('claude', ['--api', '--max-context=1000000', ...args], { 
-      stdio: 'inherit',
-      env: env
-    });
-    
-    claude.on('error', (error) => {
-      if (error.code === 'ENOENT') {
-        console.error('❌ Claude CLI not found. Please install Claude first.');
-        console.error('   Visit: https://claude.ai/cli');
-      } else {
-        console.error('❌ Error running claude with API:', error.message);
-        console.log('🔄 Falling back to local claude...\n');
-        callLocalClaude();
-        return;
-      }
-      process.exit(1);
-    });
-    
-    claude.on('close', (code) => {
-      if (code !== 0) {
-        console.error('❌ Claude API mode failed with exit code:', code);
-        console.log('🔄 Falling back to local claude...\n');
-        callLocalClaude();
-      } else {
-        process.exit(code);
-      }
-    });
-    
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    console.log('🔄 Falling back to local claude...\n');
-    callLocalClaude();
-  }
+
+      // Pass all arguments to claude command with --api and --max-context flags
+      const args = process.argv.slice(2);
+
+      // Create environment with API key
+      const env = { ...process.env, ANTHROPIC_API_KEY: apiKey };
+
+      // Use claude with API mode and max context
+      const claude = spawn('claude', ['--api', '--max-context=1000000', ...args], {
+        stdio: 'inherit',
+        env: env
+      });
+
+      claude.on('error', (error) => {
+        if (error.code === 'ENOENT') {
+          console.error('❌ Claude CLI not found. Please install Claude first.');
+          console.error('   Visit: https://claude.ai/cli');
+        } else {
+          console.error('❌ Error running claude with API:', error.message);
+          console.log('🔄 Falling back to local claude...\n');
+          callLocalClaude();
+          return;
+        }
+        process.exit(1);
+      });
+
+      claude.on('close', (code) => {
+        if (code !== 0) {
+          console.error('❌ Claude API mode failed with exit code:', code);
+          console.log('🔄 Falling back to local claude...\n');
+          callLocalClaude();
+        } else {
+          process.exit(code);
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error:', error.message);
+      console.log('🔄 Falling back to local claude...\n');
+      callLocalClaude();
+    }
   } // End of proceedWithAPI
 }
 
 function callLocalClaude() {
   console.log('💻 Using Local Claude');
-  
+
   // Track local usage
   const usage = costControl.loadUsage();
   usage.totalCalls++;
   usage.localCalls++;
   costControl.saveUsage(usage);
-  
+
   try {
     // Pass all arguments to claude command
     const args = process.argv.slice(2);
     const claude = spawn('claude', args, { stdio: 'inherit' });
-    
+
     claude.on('error', (error) => {
       if (error.code === 'ENOENT') {
         console.error('❌ Claude CLI not found. Please install Claude first.');
@@ -189,11 +189,11 @@ function callLocalClaude() {
       }
       process.exit(1);
     });
-    
+
     claude.on('close', (code) => {
       process.exit(code);
     });
-    
+
   } catch (error) {
     console.error('❌ Error:', error.message);
     process.exit(1);
@@ -245,18 +245,18 @@ Environment Variables:
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   // Handle flags
   if (args.includes('--setup')) {
     runSetup();
     return;
   }
-  
+
   if (args.includes('--cost-control')) {
     costControl.showMenu();
     return;
   }
-  
+
   if (args.includes('--disable')) {
     const settings = costControl.loadSettings();
     settings.apiEnabled = false;
@@ -266,7 +266,7 @@ function main() {
     console.log('💡 No API costs will be incurred');
     return;
   }
-  
+
   if (args.includes('--enable')) {
     const settings = costControl.loadSettings();
     settings.apiEnabled = true;
@@ -276,7 +276,7 @@ function main() {
     console.log('💡 Run "claude-auto --cost-control" to manage costs');
     return;
   }
-  
+
   if (args.includes('--status')) {
     const settings = costControl.loadSettings();
     const usage = costControl.loadUsage();
@@ -289,22 +289,22 @@ function main() {
     console.log('\n💡 Use "claude-auto --cost-control" for detailed management');
     return;
   }
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     showHelp();
     return;
   }
-  
+
   // Get the task from arguments
   const task = args.join(' ');
-  
+
   if (!task) {
     console.log('🤖 Claude Auto Global');
     console.log('💡 Tip: Use --help for usage information');
     callLocalClaude();
     return;
   }
-  
+
   // Determine if we need API based on task content
   if (needsAPI(task)) {
     callClaudeWithAPI(task);

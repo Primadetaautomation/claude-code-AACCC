@@ -5,7 +5,7 @@
 module.exports = {
   // Test environment
   testEnvironment: 'node',
-  
+
   // Test file patterns
   testMatch: [
     '**/tests/unit/**/*.test.js',
@@ -13,7 +13,7 @@ module.exports = {
     '**/__tests__/**/*.js',
     '**/?(*.)+(spec|test).js'
   ],
-  
+
   // Ignore patterns
   testPathIgnorePatterns: [
     '/node_modules/',
@@ -21,7 +21,7 @@ module.exports = {
     '/build/',
     '/dist/'
   ],
-  
+
   // Coverage settings
   collectCoverage: true,
   coverageDirectory: 'coverage',
@@ -33,7 +33,7 @@ module.exports = {
     '!**/coverage/**',
     '!**/tests/**'
   ],
-  
+
   // Coverage thresholds
   coverageThreshold: {
     global: {
@@ -43,22 +43,22 @@ module.exports = {
       statements: 70
     }
   },
-  
+
   // Setup files
   setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.js'],
-  
+
   // Module paths
   moduleDirectories: ['node_modules', '<rootDir>'],
-  
+
   // Timeout
   testTimeout: 10000,
-  
+
   // Verbose output
   verbose: true,
-  
+
   // Clear mocks between tests
   clearMocks: true,
-  
+
   // Restore mocks after each test
   restoreMocks: true
 };

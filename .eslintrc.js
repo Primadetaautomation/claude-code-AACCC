@@ -18,7 +18,7 @@ module.exports = {
     'no-console': 'off', // Allow console for CLI tool
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-undef': 'error',
-    
+
     // Best Practices
     'curly': ['error', 'all'],
     'eqeqeq': ['error', 'always'],
@@ -27,11 +27,11 @@ module.exports = {
     'no-with': 'error',
     'no-loop-func': 'error',
     'no-new-func': 'error',
-    
+
     // Variables
     'no-shadow': 'error',
     'no-use-before-define': ['error', { functions: false }],
-    
+
     // Stylistic Issues
     'indent': ['error', 2],
     'linebreak-style': ['error', 'unix'],
@@ -40,7 +40,7 @@ module.exports = {
     'comma-dangle': ['error', 'never'],
     'no-trailing-spaces': 'error',
     'eol-last': 'error',
-    
+
     // ES6
     'arrow-spacing': 'error',
     'no-var': 'error',

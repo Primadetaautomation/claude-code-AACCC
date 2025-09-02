@@ -22,10 +22,10 @@ function encryptAPIKey(apiKey) {
     const key = crypto.scryptSync(os.hostname() + os.userInfo().username, 'salt', 32);
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    
+
     let encrypted = cipher.update(apiKey, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    
+
     // Store IV and encrypted data together
     return iv.toString('hex') + ':' + encrypted;
   } catch (error) {
@@ -37,9 +37,9 @@ function encryptAPIKey(apiKey) {
 async function testAPIKey(apiKey) {
   try {
     const fetch = (await import('node-fetch')).default;
-    
+
     console.log('🔍 Testing API key...');
-    
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -115,21 +115,21 @@ async function saveAPIKey(apiKey) {
 function showCurrentStatus() {
   console.log('\n📊 Current Configuration:');
   console.log('─'.repeat(30));
-  
+
   // Check environment variable
   if (process.env.ANTHROPIC_API_KEY) {
     console.log('🌍 Environment: ANTHROPIC_API_KEY is set');
   } else {
     console.log('🌍 Environment: ANTHROPIC_API_KEY not set');
   }
-  
+
   // Check encrypted file
   if (fs.existsSync(API_KEY_FILE)) {
     console.log('🔐 Stored key: Found encrypted API key');
   } else {
     console.log('🔐 Stored key: No encrypted API key found');
   }
-  
+
   console.log('📁 Config dir:', CONFIG_DIR);
 }
 
@@ -159,11 +159,11 @@ async function main() {
   try {
     console.clear();
     showCurrentStatus();
-    
+
     createConfigDir();
-    
+
     const apiKey = await promptForAPIKey();
-    
+
     if (!apiKey) {
       console.log('\n⚠️  Skipping API key setup.');
       console.log('   You can run "claude-auto --setup" again later.');
@@ -171,32 +171,32 @@ async function main() {
       showUsageInstructions();
       return;
     }
-    
+
     // Validate API key format
     if (!apiKey.startsWith('sk-ant-')) {
       console.log('\n⚠️  Warning: API key should start with "sk-ant-"');
       console.log('   Are you sure this is correct? Continuing anyway...');
     }
-    
+
     // Test the API key
     const isValid = await testAPIKey(apiKey);
-    
+
     if (!isValid) {
       console.log('\n❌ API key test failed. Please check your key and try again.');
       console.log('   Run "claude-auto --setup" to retry.');
       process.exit(1);
     }
-    
+
     // Save the API key
     const saved = await saveAPIKey(apiKey);
-    
+
     if (saved) {
       showUsageInstructions();
     } else {
       console.log('\n❌ Setup failed. Please try again.');
       process.exit(1);
     }
-    
+
   } catch (error) {
     console.error('\n❌ Setup error:', error.message);
     process.exit(1);

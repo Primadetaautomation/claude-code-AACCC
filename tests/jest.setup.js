@@ -21,7 +21,7 @@ global.testUtils = {
     capabilities: ['test-capability'],
     ...overrides
   }),
-  
+
   // Helper to create mock API responses
   createMockResponse: (data, status = 200) => ({
     ok: status >= 200 && status < 300,
@@ -29,17 +29,17 @@ global.testUtils = {
     json: async () => data,
     text: async () => JSON.stringify(data)
   }),
-  
+
   // Helper to suppress console output during tests
   suppressConsole: () => {
     const originalLog = console.log;
     const originalError = console.error;
     const originalWarn = console.warn;
-    
+
     console.log = jest.fn();
     console.error = jest.fn();
     console.warn = jest.fn();
-    
+
     return () => {
       console.log = originalLog;
       console.error = originalError;
