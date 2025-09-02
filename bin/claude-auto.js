@@ -8,6 +8,8 @@ const os = require('os');
 
 // Import our API detector
 const { needsAPI } = require('../lib/api-detector');
+// Import cost control
+const costControl = require('../scripts/cost-control');
 
 const CONFIG_DIR = path.join(os.homedir(), '.claude-config');
 const API_KEY_FILE = path.join(CONFIG_DIR, 'api-key.encrypted');
@@ -46,15 +48,80 @@ function getAPIKey() {
 }
 
 function callClaudeWithAPI(task) {
-  const apiKey = getAPIKey();
+  // Check cost controls first
+  const settings = costControl.loadSettings();
+  const usage = costControl.loadUsage();
   
-  if (!apiKey) {
-    console.error('❌ No API key found. Run: claude-auto --setup');
-    process.exit(1);
+  // Check if API is disabled
+  if (!settings.apiEnabled || settings.forceLocal) {
+    console.log('⚠️  API Mode is DISABLED (Cost Control)');
+    console.log('💡 Using local Claude instead...');
+    callLocalClaude();
+    return;
   }
+  
+  // Check cost limit
+  if (settings.costLimit && usage.estimatedCost >= settings.costLimit) {
+    console.log('🚫 COST LIMIT REACHED: $' + settings.costLimit);
+    console.log('💡 Using local Claude instead...');
+    console.log('   Run "claude-auto --cost-control" to adjust limit');
+    callLocalClaude();
+    return;
+  }
+  
+  // Show cost warning if needed
+  if (usage.estimatedCost >= settings.warningThreshold) {
+    console.log('⚠️  Cost Warning: $' + usage.estimatedCost.toFixed(2) + ' spent this period');
+  }
+  
+  // Require confirmation if enabled
+  if (settings.requireConfirmation) {
+    const readline = require('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    
+    console.log('\n💰 This will use the Claude API (costs apply)');
+    console.log('   Estimated cost: ~$0.015 per call');
+    rl.question('   Continue? (y/n): ', (answer) => {
+      rl.close();
+      if (answer.toLowerCase() !== 'y') {
+        console.log('❌ Cancelled - using local Claude instead');
+        callLocalClaude();
+        return;
+      }
+      proceedWithAPI();
+    });
+    return;
+  }
+  
+  proceedWithAPI();
+  
+  function proceedWithAPI() {
+    const apiKey = getAPIKey();
+    
+    if (!apiKey) {
+      console.error('❌ No API key found. Run: claude-auto --setup');
+      process.exit(1);
+    }
+    
+    // Track usage
+    const today = new Date().toISOString().split('T')[0];
+    usage.totalCalls++;
+    usage.apiCalls++;
+    usage.estimatedCost += 0.015; // Rough estimate
+    
+    if (!usage.dailyUsage[today]) {
+      usage.dailyUsage[today] = { calls: 0, cost: 0 };
+    }
+    usage.dailyUsage[today].calls++;
+    usage.dailyUsage[today].cost += 0.015;
+    
+    costControl.saveUsage(usage);
 
-  try {
-    console.log('🤖 Using Claude API (High Context Mode)');
+    try {
+      console.log('🤖 Using Claude API (High Context Mode)');
     
     // Pass all arguments to claude command with --api and --max-context flags
     const args = process.argv.slice(2);
@@ -96,10 +163,17 @@ function callClaudeWithAPI(task) {
     console.log('🔄 Falling back to local claude...\n');
     callLocalClaude();
   }
+  } // End of proceedWithAPI
 }
 
 function callLocalClaude() {
   console.log('💻 Using Local Claude');
+  
+  // Track local usage
+  const usage = costControl.loadUsage();
+  usage.totalCalls++;
+  usage.localCalls++;
+  costControl.saveUsage(usage);
   
   try {
     // Pass all arguments to claude command
@@ -143,6 +217,10 @@ Claude Auto Global - Intelligent Claude API Management
 Usage:
   claude-auto [options] [task]
   claude-auto --setup          Configure API key
+  claude-auto --cost-control   Manage costs and usage
+  claude-auto --disable        Quick disable API mode
+  claude-auto --enable         Quick enable API mode
+  claude-auto --status         Show current status
   claude-auto --help           Show this help
 
 Features:
@@ -171,6 +249,44 @@ function main() {
   // Handle flags
   if (args.includes('--setup')) {
     runSetup();
+    return;
+  }
+  
+  if (args.includes('--cost-control')) {
+    costControl.showMenu();
+    return;
+  }
+  
+  if (args.includes('--disable')) {
+    const settings = costControl.loadSettings();
+    settings.apiEnabled = false;
+    settings.forceLocal = true;
+    costControl.saveSettings(settings);
+    console.log('✅ API Mode DISABLED - Only local Claude will be used');
+    console.log('💡 No API costs will be incurred');
+    return;
+  }
+  
+  if (args.includes('--enable')) {
+    const settings = costControl.loadSettings();
+    settings.apiEnabled = true;
+    settings.forceLocal = false;
+    costControl.saveSettings(settings);
+    console.log('✅ API Mode ENABLED - Will use API when needed');
+    console.log('💡 Run "claude-auto --cost-control" to manage costs');
+    return;
+  }
+  
+  if (args.includes('--status')) {
+    const settings = costControl.loadSettings();
+    const usage = costControl.loadUsage();
+    console.log('\n📊 Claude Auto Status:');
+    console.log('─────────────────────────');
+    console.log(`API Mode: ${settings.apiEnabled ? '✅ ENABLED' : '❌ DISABLED'}`);
+    console.log(`Estimated Costs: $${usage.estimatedCost.toFixed(2)}`);
+    console.log(`API Calls Today: ${usage.apiCalls}`);
+    console.log(`Cost Limit: ${settings.costLimit ? '$' + settings.costLimit : 'None'}`);
+    console.log('\n💡 Use "claude-auto --cost-control" for detailed management');
     return;
   }
   

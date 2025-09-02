@@ -7,10 +7,13 @@ Comprehensive Claude development environment with intelligent API management, sp
 - 🔍 **Smart Detection**: Automatically detects when tasks need high-context API
 - 🤖 **Multiple Agents**: 8 specialized Claude agents for different development tasks
 - 🔐 **Secure Storage**: Encrypted API key storage with machine-specific encryption
+- 💰 **Cost Control**: Complete cost management with limits, warnings, and tracking
+- 🚦 **Easy On/Off**: Simple commands to enable/disable API mode instantly
 - 💻 **Fallback Support**: Falls back to local Claude for simple tasks
 - 🎭 **Playwright Integration**: Complete browser testing automation
+- 📊 **Usage Tracking**: Monitor your API usage and estimated costs
+- 🛡️ **Safety Features**: Cost limits, confirmation prompts, emergency shutdown
 - 🌍 **Environment Support**: Supports `ANTHROPIC_API_KEY` environment variable
-- 📊 **Clear Feedback**: Always shows which mode is being used
 - 🚀 **Quick Setup**: One-command installation for Windows and Mac
 
 ## 🚀 Quick Installation
@@ -253,6 +256,41 @@ ls -la agents/
 nano agents/senior-fullstack-developer.json
 ```
 
+## 💰 Cost Control & Management
+
+### Quick Commands
+
+```bash
+# DISABLE API MODE (no costs)
+claude-auto --disable
+
+# ENABLE API MODE
+claude-auto --enable
+
+# CHECK STATUS & COSTS
+claude-auto --status
+
+# FULL COST CONTROL CENTER
+claude-auto --cost-control
+```
+
+### Cost Control Features
+
+The Cost Control Center provides:
+- 💵 **Cost Limits**: Set daily/monthly spending limits
+- ⚠️ **Warnings**: Get alerts before reaching limits
+- 📊 **Usage Tracking**: Monitor API calls and costs
+- ✋ **Confirmation Mode**: Require approval for each API call
+- 🚨 **Emergency Shutdown**: Instantly disable all API calls
+- 📈 **Usage Reports**: Daily/weekly/monthly cost breakdowns
+
+### Safety Features
+
+1. **Automatic Shutoff**: API calls stop when limit reached
+2. **Fallback to Local**: Always falls back to free local Claude
+3. **Cost Projections**: See estimated daily/monthly costs
+4. **Per-Call Estimates**: ~$0.015 per API call shown
+
 ## 📖 Usage
 
 ### Basic Usage
@@ -269,6 +307,9 @@ claude-auto --help
 
 # Reconfigure API key
 claude-auto --setup
+
+# Manage costs
+claude-auto --cost-control
 ```
 
 ### Smart Detection Examples
