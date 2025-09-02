@@ -1,0 +1,166 @@
+{
+  "version": "1.0.0",
+  "updated": "2025-09-02T14:40:42.157Z",
+  "agents": {
+    "master-orchestrator": {
+      "id": "master-orchestrator",
+      "name": "Master Orchestrator",
+      "emoji": "🎤",
+      "description": "Primary coordinator agent that manages task distribution across other agents and provides high-level project oversight",
+      "version": "1.0.0",
+      "capabilities": [
+        "task-distribution",
+        "project-oversight",
+        "workflow-coordination",
+        "architectural-decisions",
+        "agent-management",
+        "resource-allocation",
+        "timeline-planning",
+        "stakeholder-communication"
+      ],
+      "configFile": "agents/master-orchestrator.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.157Z"
+    },
+    "senior-fullstack-developer": {
+      "id": "senior-fullstack-developer",
+      "name": "Senior Full-Stack Developer",
+      "emoji": "💻",
+      "description": "Complete application development specialist handling frontend, backend, APIs, and database implementation",
+      "version": "1.0.0",
+      "capabilities": [
+        "frontend-development",
+        "backend-development",
+        "api-design",
+        "database-design",
+        "full-stack-architecture",
+        "code-review",
+        "performance-optimization",
+        "debugging"
+      ],
+      "configFile": "agents/senior-fullstack-developer.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.157Z"
+    },
+    "qa-testing-engineer": {
+      "id": "qa-testing-engineer",
+      "name": "QA Testing Engineer",
+      "emoji": "🧪",
+      "description": "Quality assurance specialist focused on comprehensive testing strategies, automation, and bug prevention",
+      "version": "1.0.0",
+      "capabilities": [
+        "test-planning",
+        "test-automation",
+        "unit-testing",
+        "integration-testing",
+        "performance-testing",
+        "security-testing",
+        "bug-identification",
+        "test-reporting"
+      ],
+      "configFile": "agents/qa-testing-engineer.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.157Z"
+    },
+    "security-specialist": {
+      "id": "security-specialist",
+      "name": "Security Specialist",
+      "emoji": "🔒",
+      "description": "Cybersecurity expert focused on vulnerability assessment, threat modeling, and security architecture implementation",
+      "version": "1.0.0",
+      "capabilities": [
+        "security-assessment",
+        "vulnerability-analysis",
+        "threat-modeling",
+        "security-architecture",
+        "penetration-testing",
+        "compliance-auditing",
+        "incident-response",
+        "security-training"
+      ],
+      "configFile": "agents/security-specialist.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.157Z"
+    },
+    "solutions-architect": {
+      "id": "solutions-architect",
+      "name": "Solutions Architect",
+      "emoji": "🏢",
+      "description": "Enterprise architect specializing in system design, technology strategy, and scalable solution architecture",
+      "version": "1.0.0",
+      "capabilities": [
+        "system-architecture",
+        "technology-strategy",
+        "scalability-planning",
+        "integration-design",
+        "cloud-architecture",
+        "performance-optimization",
+        "technical-leadership",
+        "stakeholder-communication"
+      ],
+      "configFile": "agents/solutions-architect.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.158Z"
+    },
+    "devops-deployment-engineer": {
+      "id": "devops-deployment-engineer",
+      "name": "DevOps Deployment Engineer",
+      "emoji": "🚀",
+      "description": "Infrastructure and deployment specialist focused on CI/CD pipelines, containerization, and cloud operations",
+      "version": "1.0.0",
+      "capabilities": [
+        "ci-cd-pipelines",
+        "containerization",
+        "infrastructure-as-code",
+        "monitoring-logging",
+        "cloud-deployment",
+        "automation",
+        "performance-optimization",
+        "disaster-recovery"
+      ],
+      "configFile": "agents/devops-deployment-engineer.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.158Z"
+    },
+    "playwright-test-agent": {
+      "id": "playwright-test-agent",
+      "name": "Playwright Test Agent",
+      "emoji": "🎭",
+      "description": "Browser automation and end-to-end testing specialist using Playwright for comprehensive web application testing",
+      "version": "1.0.0",
+      "capabilities": [
+        "e2e-testing",
+        "cross-browser-testing",
+        "mobile-testing",
+        "visual-testing",
+        "performance-testing",
+        "accessibility-testing",
+        "test-automation",
+        "api-testing"
+      ],
+      "configFile": "agents/playwright-test-agent.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.158Z"
+    },
+    "context-manager": {
+      "id": "context-manager",
+      "name": "Context Manager",
+      "emoji": "🧠",
+      "description": "Context optimization and documentation specialist focused on efficient token usage and knowledge management",
+      "version": "1.0.0",
+      "capabilities": [
+        "context-optimization",
+        "documentation-generation",
+        "knowledge-management",
+        "code-analysis",
+        "token-optimization",
+        "information-architecture",
+        "content-summarization",
+        "project-documentation"
+      ],
+      "configFile": "agents/context-manager.json",
+      "installed": true,
+      "lastUpdated": "2025-09-02T14:40:42.158Z"
+    }
+  }
+}
