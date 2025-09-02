@@ -43,7 +43,7 @@ jobs:
       run: npm run validate-agents
       
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: matrix.node-version == '18.x'
       with:
         file: ./coverage/lcov.info
@@ -73,7 +73,7 @@ jobs:
         CI: true
         
     - name: Upload Playwright report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
@@ -100,12 +100,12 @@ jobs:
       run: npm audit --audit-level moderate
       
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: javascript
     
     - name: Run CodeQL analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
         
   build-and-package:
     runs-on: ubuntu-latest
@@ -131,7 +131,7 @@ jobs:
       run: npm pack
       
     - name: Upload package artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: npm-package
         path: '*.tgz'
@@ -159,7 +159,7 @@ jobs:
       
     - name: Generate changelog
       id: changelog
-      uses: conventional-changelog/conventional-changelog@v1
+      uses: conventional-changelog/conventional-changelog@v2
       
     - name: Create GitHub Release
       uses: actions/create-release@v1
